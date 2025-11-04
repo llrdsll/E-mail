@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vídeo 2480x8000 — Scroll Vertical</title>
+  <style>
+    /* Página permite scroll vertical para exibir todo o vídeo */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow-x: hidden;   /* impede scroll horizontal */
+      overflow-y: auto;     /* permite scroll vertical */
+    }
+
+    /* O vídeo terá largura total da tela e altura proporcional (8000px) */
+    video {
+      width: 100vw;       /* ocupa toda a largura da tela */
+      height: auto;       /* mantém proporção original */
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Vídeo com proporção original 2480x8000 -->
+  <video src="oi.mp4" autoplay muted loop playsinline></video>
+
+</body>
+</html>
