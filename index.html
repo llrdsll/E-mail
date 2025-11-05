@@ -3,232 +3,93 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Biblioteca de GIFs</title>
+  <title>Galeria de GIFs</title>
   <style>
     :root{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#111}
     body{margin:18px; background:#f7f7f8}
-    h1{font-size:20px;margin-bottom:6px}
-    .card{background:white;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(16,24,40,.06);margin-bottom:12px}
-    label{display:block;margin-top:8px;font-size:13px}
-    input[type=text], input[type=email], input[type=file], button, select{width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid #e6e9ee;box-sizing:border-box}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
-    .item{background:#fff;padding:8px;border-radius:10px;display:flex;flex-direction:column;gap:8px}
-    .thumb{width:100%;height:auto;object-fit:contain;border-radius:6px;background:#000}
-    .meta{font-size:12px;color:#334155}
-    .actions{display:flex;gap:8px}
-    .small{padding:6px;font-size:13px}
-    .note{font-size:12px;color:#475569;margin-top:8px}
-    footer{margin-top:14px;font-size:12px;color:#64748b}
+    h1{font-size:22px;margin-bottom:14px;font-weight:600}
+    .searchBar{margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap}
+    input[type=text]{flex:1;min-width:200px;padding:10px;border-radius:10px;border:1px solid #d6d6d6;font-size:14px}
+    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:8px}
+    .item{background:#fff;padding:10px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:8px}
+    .thumb{width:100%;height:auto;object-fit:contain;border-radius:8px;background:#000;cursor:pointer}
+    .meta{font-size:12px;color:#475569;line-height:1.4}
+    footer{margin-top:22px;font-size:12px;color:#64748b;text-align:center}
   </style>
 </head>
 <body>
-  <h1>Biblioteca de GIFs — (qualidade preservada)</h1>
-  <div class="card">
-    <strong>Adicionar GIFs</strong>
-    <p class="note">Os GIFs são guardados localmente no seu navegador usando IndexedDB — a qualidade original é preservada como blob. Faça backup exportando os itens se quiser.</p>
 
-    <label for="files">Escolher GIFs (pode selecionar vários)</label>
-    <input id="files" type="file" accept="image/gif" multiple>
+  <h1>Galeria de GIFs</h1>
 
-    <div class="row">
-      <div>
-        <label for="emailTag">Email (tag)</label>
-        <input id="emailTag" type="email" placeholder="contato@exemplo.com">
-      </div>
-      <div>
-        <label for="whatsappTag">WhatsApp (tag)</label>
-        <input id="whatsappTag" type="text" placeholder="55 11 9xxxx-xxxx">
-      </div>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:8px">
-      <button id="btnAdd" class="small">Adicionar à Biblioteca</button>
-      <button id="btnExport" class="small">Exportar (JSON)</button>
-      <button id="btnClear" class="small">Limpar tudo</button>
-    </div>
+  <div class="searchBar">
+    <input id="searchText" type="text" placeholder="Pesquisar por nome do arquivo, email ou WhatsApp...">
   </div>
 
-  <div class="card">
-    <strong>Filtros</strong>
-    <div class="row">
-      <div>
-        <label for="filterEmail">Filtrar por email</label>
-        <input id="filterEmail" type="text" placeholder="digite email ou parte">
-      </div>
-      <div>
-        <label for="filterWhatsapp">Filtrar por WhatsApp</label>
-        <input id="filterWhatsapp" type="text" placeholder="digite número ou parte">
-      </div>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:8px">
-      <button id="btnFilter" class="small">Aplicar filtro</button>
-      <button id="btnReset" class="small">Limpar filtro</button>
-    </div>
-  </div>
+  <div id="list" class="list"></div>
 
-  <div id="list" class="list" aria-live="polite"></div>
-
-  <footer>Observação: os arquivos ficam no seu navegador (local). Para usar em outro dispositivo, exporte e depois importe (JSON contém os GIFs codificados).</footer>
+  <footer>GIFs adicionados manualmente. Nenhum é comprimido ou modificado — qualidade 100% preservada.</footer>
 
 <script>
-// IndexedDB util
-const DB_NAME = 'gifLibraryDB';
-const STORE = 'gifs';
-let db;
+// ---- CONFIGURAÇÃO MANUAL DOS GIFS ----
+// Adicione seus GIFs aqui. Basta colocar os arquivos .gif na mesma pasta e cadastrar abaixo.
+// Não serão comprimidos pois são carregados como arquivos originais.
+// Campos: src (caminho), email (tag), whatsapp (tag)
+const GIFS = [
+  { src: 'gif1.gif', email: 'contato@exemplo.com', whatsapp: '5511999999999' },
+  { src: 'gif2.gif', email: 'vendas@empresa.com', whatsapp: '5532988888888' },
+  // adicione mais aqui
+];
 
-function openDB(){
-  return new Promise((res, rej)=>{
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = e => {
-      db = e.target.result;
-      if(!db.objectStoreNames.contains(STORE)){
-        db.createObjectStore(STORE, { keyPath: 'id' });
-      }
-    }
-    req.onsuccess = e => { db = e.target.result; res(db); }
-    req.onerror = e => rej(e);
-  })
-}
+// ---- RENDERIZAÇÃO ----
+function renderGallery(filter=''){
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  const query = filter.trim().toLowerCase();
 
-function addGifEntry(id, file, email, whatsapp){
-  return new Promise((res, rej)=>{
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    const entry = { id, file, email, whatsapp, createdAt: new Date().toISOString() };
-    const rq = store.add(entry);
-    rq.onsuccess = ()=> res(entry);
-    rq.onerror = e=> rej(e);
-  })
-}
-
-function getAll(){
-  return new Promise((res, rej)=>{
-    const tx = db.transaction(STORE, 'readonly');
-    const store = tx.objectStore(STORE);
-    const req = store.getAll();
-    req.onsuccess = ()=> res(req.result);
-    req.onerror = e=> rej(e);
-  })
-}
-
-function clearAll(){
-  return new Promise((res, rej)=>{
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    const req = store.clear();
-    req.onsuccess = ()=> res();
-    req.onerror = e=> rej(e);
-  })
-}
-
-function deleteId(id){
-  return new Promise((res, rej)=>{
-    const tx = db.transaction(STORE, 'readwrite');
-    const store = tx.objectStore(STORE);
-    const req = store.delete(id);
-    req.onsuccess = ()=> res();
-    req.onerror = e=> rej(e);
-  })
-}
-
-// helpers
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
-
-async function renderList(filterEmail='', filterWhatsapp=''){
-  const listEl = document.getElementById('list');
-  listEl.innerHTML = '';
-  const items = await getAll();
-  const filtered = items.filter(it => {
-    const matchEmail = filterEmail.trim() === '' || (it.email || '').toLowerCase().includes(filterEmail.toLowerCase());
-    const matchWhats = filterWhatsapp.trim() === '' || (it.whatsapp || '').toLowerCase().includes(filterWhatsapp.toLowerCase());
-    return matchEmail && matchWhats;
-  }).sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+  const filtered = GIFS.filter(g =>
+    !query ||
+    (g.src && g.src.toLowerCase().includes(query)) ||
+    (g.email && g.email.toLowerCase().includes(query)) ||
+    (g.whatsapp && g.whatsapp.toLowerCase().includes(query))
+  );
 
   if(filtered.length === 0){
-    listEl.innerHTML = '<div class="card">Nenhum GIF encontrado.</div>';
+    list.innerHTML = '<div style="opacity:.6">Nenhum GIF encontrado.</div>';
     return;
   }
 
-  for(const it of filtered){
-    const url = URL.createObjectURL(it.file);
-    const div = document.createElement('div'); div.className = 'item';
-    const img = document.createElement('img'); img.className = 'thumb'; img.src = url; img.alt = it.id;
+  filtered.forEach(g =>{
+    const div = document.createElement('div');
+    div.className = 'item';
+
+    const img = document.createElement('img');
+    img.className = 'thumb';
+    img.src = g.src;
+    img.alt = g.src;
     img.loading = 'lazy';
-    // clicking opens original in new tab (preserve original size/quality)
-    img.style.cursor = 'pointer';
-    img.onclick = ()=> window.open(url, '_blank');
+    img.onclick = ()=> window.open(g.src, '_blank'); // abre GIF original sem perder qualidade
 
-    const meta = document.createElement('div'); meta.className = 'meta';
-    meta.innerHTML = <div><strong>Email:</strong> ${it.email || '—'}</div><div><strong>WhatsApp:</strong> ${it.whatsapp || '—'}</div><div style="margin-top:6px;font-size:11px;color:#94a3b8">Adicionado: ${new Date(it.createdAt).toLocaleString()}</div>;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `
+      <div><strong>Arquivo:</strong> ${g.src}</div>
+      <div><strong>Email:</strong> ${g.email || '—'}</div>
+      <div><strong>WhatsApp:</strong> ${g.whatsapp || '—'}</div>
+    `;
 
-    const actions = document.createElement('div'); actions.className = 'actions';
-    const dl = document.createElement('a'); dl.className = 'small'; dl.textContent = 'Baixar';
-    dl.href = url; dl.download = (it.file && it.file.name) || (it.id + '.gif'); dl.style.textDecoration='none'; dl.style.border='1px solid #e2e8f0'; dl.style.padding='6px'; dl.style.borderRadius='8px';
-
-    const del = document.createElement('button'); del.className = 'small'; del.textContent = 'Remover'; del.onclick = async ()=>{
-      if(confirm('Remover este GIF?')){ await deleteId(it.id); URL.revokeObjectURL(url); renderList(document.getElementById('filterEmail').value, document.getElementById('filterWhatsapp').value); }
-    };
-
-    actions.appendChild(dl); actions.appendChild(del);
-    div.appendChild(img); div.appendChild(meta); div.appendChild(actions);
-    listEl.appendChild(div);
-  }
+    div.appendChild(img);
+    div.appendChild(meta);
+    list.appendChild(div);
+  });
 }
 
-async function init(){
-  await openDB();
-  await renderList();
-}
-
-// add handler
-document.getElementById('btnAdd').addEventListener('click', async ()=>{
-  const input = document.getElementById('files');
-  const email = document.getElementById('emailTag').value.trim();
-  const whatsapp = document.getElementById('whatsappTag').value.trim();
-  if(!input.files || input.files.length === 0){ alert('Selecione ao menos um GIF.'); return; }
-  for(const f of Array.from(input.files)){
-    // preserve as blob, do not re-encode
-    const id = uid();
-    await addGifEntry(id, f, email, whatsapp);
-  }
-  input.value = '';
-  document.getElementById('emailTag').value = '';
-  document.getElementById('whatsappTag').value = '';
-  await renderList();
+// ---- EVENTOS ----
+document.getElementById('searchText').addEventListener('input', e =>{
+  renderGallery(e.target.value);
 });
 
-// filters
-document.getElementById('btnFilter').addEventListener('click', ()=>{
-  const e = document.getElementById('filterEmail').value;
-  const w = document.getElementById('filterWhatsapp').value;
-  renderList(e,w);
-});
-document.getElementById('btnReset').addEventListener('click', ()=>{ document.getElementById('filterEmail').value=''; document.getElementById('filterWhatsapp').value=''; renderList(); });
-
-// export (simple JSON with base64) — cuidado com arquivos grandes
-document.getElementById('btnExport').addEventListener('click', async ()=>{
-  if(!confirm('Exportar tudo para JSON (inclui os GIFs codificados). Pode gerar um arquivo grande). Deseja continuar?')) return;
-  const items = await getAll();
-  const out = [];
-  for(const it of items){
-    const arrayBuffer = await it.file.arrayBuffer();
-    const b64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    out.push({ id: it.id, filename: it.file.name, email: it.email, whatsapp: it.whatsapp, createdAt: it.createdAt, data: b64 });
-  }
-  const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'gif-library-export.json'; a.click(); URL.revokeObjectURL(url);
-});
-
-// clear
-document.getElementById('btnClear').addEventListener('click', async ()=>{
-  if(confirm('Apagar toda a biblioteca local? Essa ação é irreversível.')){
-    await clearAll(); renderList();
-  }
-});
-
-init().catch(err=>{ console.error(err); alert('Erro ao abrir banco de dados: '+err); });
+// inicializa
+enderGallery();
 </script>
 </body>
 </html>
