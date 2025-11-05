@@ -10,10 +10,10 @@
     h1{font-size:22px;margin-bottom:14px;font-weight:600}
     .searchBar{margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap}
     input[type=text]{flex:1;min-width:200px;padding:10px;border-radius:10px;border:1px solid #d6d6d6;font-size:14px}
-    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:8px}
-    .item{background:#fff;padding:10px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:8px}
-    .thumb{width:100%;height:auto;object-fit:contain;border-radius:8px;background:#000;cursor:pointer}
-    .meta{font-size:12px;color:#475569;line-height:1.4}
+    .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:8px}
+    .item{background:transparent;padding:0;box-shadow:none;display:flex;flex-direction:column;gap:6px;align-items:center}
+    .thumb{width:100%;height:auto;object-fit:contain;border-radius:8px;cursor:pointer;opacity:.85;transition:opacity .25s ease}
+    .thumb:hover{opacity:1}
     footer{margin-top:22px;font-size:12px;color:#64748b;text-align:center}
   </style>
 </head>
@@ -35,7 +35,7 @@
 // Não serão comprimidos pois são carregados como arquivos originais.
 // Campos: src (caminho), email (tag), whatsapp (tag)
 const GIFS = [
-  { src: 'oi.gif', email: 'contato@exemplo.com', whatsapp: '5511999999999' },
+  { src: 'gif1.gif', email: 'contato@exemplo.com', whatsapp: '5511999999999' },
   { src: 'gif2.gif', email: 'vendas@empresa.com', whatsapp: '5532988888888' },
   // adicione mais aqui
 ];
@@ -69,17 +69,9 @@ function renderGallery(filter=''){
     img.loading = 'lazy';
     img.onclick = ()=> window.open(g.src, '_blank'); // abre GIF original sem perder qualidade
 
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.innerHTML = `
-      <div><strong>Arquivo:</strong> ${g.src}</div>
-      <div><strong>Email:</strong> ${g.email || '—'}</div>
-      <div><strong>WhatsApp:</strong> ${g.whatsapp || '—'}</div>
-    `;
-
+    // não exibe metadata, apenas o gif
     div.appendChild(img);
-    div.appendChild(meta);
-    list.appendChild(div);
+    list.appendChild(div);(div);
   });
 }
 
