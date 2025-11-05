@@ -3,29 +3,120 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vídeo 2480x8000 — Scroll Vertical</title>
+  <title>GIF 2480x8000 — Scroll Vertical e Copiar</title>
   <style>
-    /* Página permite scroll vertical para exibir todo o vídeo */
+    /* Página limpa: só o GIF, para que Ctrl+A selecione apenas ele */
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
-      overflow-x: hidden;   /* impede scroll horizontal */
-      overflow-y: auto;     /* permite scroll vertical */
+      background: #ffffff; /* fundo branco para Outlook */
+      overflow-x: hidden;
+      overflow-y: auto; /* permite scroll vertical */
+      -webkit-user-select: none; /* evitar seleção de texto acidental */
+      user-select: none;
     }
 
-    /* O vídeo terá largura total da tela e altura proporcional (8000px) */
-    video {
-      width: 100vw;       /* ocupa toda a largura da tela */
-      height: auto;       /* mantém proporção original */
+    img {
+      width: 100vw; /* ocupa toda a largura da tela */
+      height: auto; /* mantém proporção (8000px de altura no arquivo original) */
       display: block;
+      -webkit-user-select: auto; /* permite selecionar a imagem */
+      user-select: auto;
     }
+
+    /* Notificação discreta quando a imagem é copiada */
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 18px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 200ms ease-in-out;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
-  <!-- Vídeo com proporção original 2480x8000 -->
-  <video src="oi.gif" autoplay muted loop playsinline>
-    
-  </video>
+
+  <!-- Substitua 'oi.gif' pelo seu arquivo GIF real -->
+  <img id="gif" src="oi.gif" alt="GIF 2480x8000" />
+
+  <div id="toast" class="toast">Imagem copiada! Cole com Ctrl+V no Outlook.</div>
+
+  <script>
+    const img = document.getElementById('gif');
+    const toast = document.getElementById('toast');
+
+    // Função para mostrar notificação curta
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
+    // Copia o GIF para a clipboard como imagem (se o navegador suportar)
+    async function copyImageToClipboard() {
+      try {
+        // Busca o blob do GIF
+        const response = await fetch(img.src, {cache: 'no-store'});
+        const blob = await response.blob();
+
+        // Criar ClipboardItem e escrever na área de transferência
+        if (navigator.clipboard && window.ClipboardItem) {
+          const item = new ClipboardItem({ [blob.type]: blob });
+          await navigator.clipboard.write([item]);
+          showToast('Imagem copiada! Cole com Ctrl+V no Outlook.');
+          return true;
+        } else {
+          // Fallback: selecione a imagem (para Ctrl+C manual)
+          selectImageForCopy();
+          showToast('Pressione Ctrl+C para copiar a imagem.');
+          return false;
+        }
+      } catch (err) {
+        console.error('Erro ao copiar imagem:', err);
+        selectImageForCopy();
+        showToast('Erro automático: use Ctrl+C para copiar a imagem.');
+        return false;
+      }
+    }
+
+    // Seleciona a imagem no DOM (fallback para Ctrl+C)
+    function selectImageForCopy() {
+      const range = document.createRange();
+      range.selectNode(img);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    // Intercepta Ctrl+A para garantir que a imagem seja copiada
+    window.addEventListener('keydown', async (e) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+      if (modKey && e.key.toLowerCase() === 'a') {
+        // Previna comportamento padrão e tente copiar a imagem automaticamente
+        e.preventDefault();
+        await copyImageToClipboard();
+      }
+    });
+
+    // Também oferecer cópia automática se o usuário clicar na imagem duas vezes
+    img.addEventListener('dblclick', async () => {
+      await copyImageToClipboard();
+    });
+
+    // Em alguns browsers, fetch pode falhar por CORS se o GIF estiver hospedado em domínio externo.
+    // Se isso acontecer, a função fará o fallback para seleção e instruirá o usuário a usar Ctrl+C.
+  </script>
+
 </body>
 </html>
