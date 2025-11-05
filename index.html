@@ -1,150 +1,40 @@
-<!--
-  Galeria de GIFs (para GitHub Pages)
-  - Salve este arquivo na raiz do seu repositório (ex: index.html) ou onde preferir.
-  - Crie uma pasta chamada  no repositório e coloque seus arquivos .gif lá.
-  - GIF de teste: oi.gif
-  - Para adicionar um GIF manualmente: copie um bloco <figure> (veja exemplos abaixo) e atualize os atributos:
-      data-name  = nome pesquisável
-      data-tags  = lista separada por vírgula (ex: whatsapp,email)
-  - A busca procura por nome e tags. Os filtros "WhatsApp" e "Email" filtram por tags.
--->
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Galeria de GIFs</title>
-  <style>
-    :root{--gap:12px;--bg:#0f1720;--card:#0b1220;--muted:#9aa4b2}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef6;background:linear-gradient(180deg,#071024 0%, #071b2a 100%)}
-    .container{max-width:1200px;margin:28px auto;padding:20px}
-    header{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    h1{margin:0;font-size:20px}
-    .controls{display:flex;gap:10px;align-items:center;margin-left:auto}
-    .search{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,0.03);padding:8px;border-radius:10px}
-    .search input{background:transparent;border:0;outline:0;color:inherit;font-size:14px;width:280px}
-    .filters{display:flex;gap:8px;align-items:center}
-    label.checkbox{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
-
-    main{margin-top:18px}
-    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--gap)}
-    figure{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:8px;min-height:150px}
-    figure img{max-width:100%;height:auto;display:block;border-radius:6px;image-rendering:auto}
-    figcaption{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
-    .tag{font-size:11px;padding:4px 6px;border-radius:999px;background:rgba(255,255,255,0.02)}
-
-    .empty{padding:34px;text-align:center;color:var(--muted)}
-    /* botão pequeno */
-    button.small{border:0;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.03);color:inherit;font-size:13px;cursor:pointer}
-
-    @media (max-width:540px){.search input{width:140px}.container{padding:12px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galeria de GIFs</title>
+<style>
+    body {
+        background: #111;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        padding: 15px;
+    }
+    .container img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 6px;
+        background: #000;
+    }
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Galeria de GIFs</h1>
 
-      <div class="controls">
-        <div class="search" role="search" aria-label="Pesquisar GIFs">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-            <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></circle>
-          </svg>
-          <input id="search" placeholder="Pesquisar por nome ou tag... (ex: oi, whatsapp)" />
-          <button id="clearSearch" class="small" title="Limpar">✕</button>
-        </div>
+<div class="container">
+    <img src="oi.gif" alt="gif">
+    <img src="gif2.gif" alt="gif">
+    <img src="gif3.gif" alt="gif">
+    <img src="gif4.gif" alt="gif">
+    <img src="gif5.gif" alt="gif">
+    <img src="gif6.gif" alt="gif">
+</div>
 
-        <div class="filters" aria-hidden>
-          <label class="checkbox"><input id="filterWhatsApp" type="checkbox" /> WhatsApp</label>
-          <label class="checkbox"><input id="filterEmail" type="checkbox" /> Email</label>
-        </div>
-
-      </div>
-    </header>
-
-    <main>
-      <section id="gallery" class="gallery" aria-live="polite">
-
-        <!-- Exemplo de GIFs: coloque os seus GIFs na pasta  e copie/edite esses blocos -->
-
-        <figure data-name="oi" data-tags="teste,whatsapp""teste,whatsapp">
-          <img src="oi.gif" alt="oi.gif" loading="eager"/>
-          <figcaption>
-            <span>oi.gif</span>
-            <span class="tag">whatsapp</span>
-          </figcaption>
-        </figure>
-
-        <!-- Outro exemplo (descomente e ajuste se necessário):
-        <figure data-name="email-bem-vindo" data-tags="email,banner">
-          <img src="email-bem-vindo.gif" alt="email-bem-vindo.gif" loading="lazy" />
-          <figcaption>
-            <span>email-bem-vindo.gif</span>
-            <span class="tag">email</span>
-          </figcaption>
-        </figure>
-        -->
-
-      </section>
-
-      <div id="empty" class="empty" style="display:none">Nenhum GIF encontrado.</div>
-
-    </main>
-
-    <p style="margin-top:14px;color:var(--muted);font-size:13px">Instruções rápidas: adicione arquivos .gif em <code></code> e insira um <code>&lt;figure&gt;</code> como no exemplo acima. Evite redimensionar os GIFs manualmente para não perder qualidade.</p>
-  </div>
-
-  <script>
-    // simples busca e filtros
-    const searchEl = document.getElementById('search');
-    const clearBtn = document.getElementById('clearSearch');
-    const filterWhats = document.getElementById('filterWhatsApp');
-    const filterEmail = document.getElementById('filterEmail');
-    const gallery = document.getElementById('gallery');
-    const empty = document.getElementById('empty');
-
-    function normalize(s){return (s||'').toString().toLowerCase();}
-
-    function matches(figure, query, wantWhats, wantEmail){
-      const name = normalize(figure.dataset.name);
-      const tags = normalize(figure.dataset.tags);
-      // busca por nome ou tags
-      const qMatch = !query || name.includes(query) || tags.includes(query);
-      // filtros por tag
-      if(wantWhats && !tags.split(',').includes('whatsapp')) return false;
-      if(wantEmail && !tags.split(',').includes('email')) return false;
-      return qMatch;
-    }
-
-    function refresh(){
-      const q = normalize(searchEl.value.trim());
-      const wantWhats = filterWhats.checked;
-      const wantEmail = filterEmail.checked;
-      const items = Array.from(gallery.querySelectorAll('figure'));
-      let shown = 0;
-      items.forEach(f => {
-        if(matches(f,q,wantWhats,wantEmail)){
-          f.style.display = '';
-          shown++;
-        } else {
-          f.style.display = 'none';
-        }
-      });
-      empty.style.display = shown? 'none':'block';
-    }
-
-    searchEl.addEventListener('input', refresh);
-    filterWhats.addEventListener('change', refresh);
-    filterEmail.addEventListener('change', refresh);
-    clearBtn.addEventListener('click', ()=>{searchEl.value='';refresh();searchEl.focus();});
-
-    // acessibilidade: permitir busca com Enter
-    searchEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') e.preventDefault(); });
-
-    // inicializa
-    document.addEventListener('DOMContentLoaded', refresh);
-  </script>
 </body>
 </html>
